@@ -2,9 +2,20 @@ import os
 import json
 import requests
 from bs4 import BeautifulSoup
+try:
+    ...
+except Exception as e:
 
-URL = "https://www.dreamland.nl/producten/pokemon-first-partner-illustration-collection/02356136"
-STATE_FILE = ".stock_state.json"
+PRODUCTS = [
+    {
+        "name": "Dreamland - First Partner - Illustration Collection",
+        "url": "https://www.dreamland.nl/producten/pokemon-first-partner-illustration-collection/02356136",
+    },
+    {
+        "name": "Dreamland - Ascended Heroes - Elite Trainer Box UK",
+        "url": "https://www.dreamland.nl/producten/pokemon-me-2-5-ascended-heroes-elite-trainer-box-uk/02344089",
+    },
+]
 
 IN_STOCK_HINTS = [
     "op voorraad",
