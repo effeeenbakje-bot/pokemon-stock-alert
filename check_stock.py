@@ -9,7 +9,6 @@ STATE_FILE = ".stock_state.json"
 IN_STOCK_HINTS = [
     "op voorraad",
     "in winkelwagen",
-    "morgen in huis",
     "direct leverbaar",
 ]
 
