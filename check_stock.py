@@ -3,7 +3,7 @@ import json
 import requests
 from bs4 import BeautifulSoup
 
-URL = "https://www.bol.com/nl/nl/p/JOUW-PRODUCT-URL-HIER/"
+URL = "https://www.dreamland.nl/producten/pokemon-first-partner-illustration-collection/02356136"
 STATE_FILE = ".stock_state.json"
 
 IN_STOCK_HINTS = [
@@ -17,6 +17,7 @@ OUT_OF_STOCK_HINTS = [
     "tijdelijk niet leverbaar",
     "niet leverbaar",
     "uitverkocht",
+    "online tijdelijk uitverkocht",
 ]
 
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
