@@ -3,6 +3,8 @@ import json
 import requests
 from bs4 import BeautifulSoup
 
+STATE_FILE = ".stock_state.json"
+
 PRODUCTS = [
     {
         "name": "Dreamland - First Partner - Illustration Collection",
@@ -32,8 +34,12 @@ CHAT_ID = os.environ["TELEGRAM_CHAT_ID"]
 
 
 def send_telegram(text: str) -> None:
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    r = requests.post(url, json={"chat_id": CHAT_ID, "text": text}, timeout=20)
+    telegram_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    r = requests.post(
+        telegram_url,
+        json={"chat_id": CHAT_ID, "text": text},
+        timeout=20,
+    )
     r.raise_for_status()
 
 
@@ -50,39 +56,69 @@ def fetch_html(url: str) -> str:
     return r.text
 
 
-def detect_stock(html: str) -> str:
+def detect_stock(html: str) -> tuple[str, str | None]:
     text = BeautifulSoup(html, "html.parser").get_text(" ", strip=True).lower()
 
-    if any(h in text for h in IN_STOCK_HINTS):
-        return "in_stock"
-    if any(h in text for h in OUT_OF_STOCK_HINTS):
-        return "out_of_stock"
-    return "unknown"
+    for hint in OUT_OF_STOCK_HINTS:
+        if hint in text:
+            return "out_of_stock", hint
+
+    for hint in IN_STOCK_HINTS:
+        if hint in text:
+            return "in_stock", hint
+
+    return "unknown", None
 
 
-def load_previous_state() -> str | None:
+def load_previous_state() -> dict:
     if not os.path.exists(STATE_FILE):
-        return None
+        return {}
+
     with open(STATE_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
-    return data.get("status")
+
+    if isinstance(data, dict):
+        return data
+
+    return {}
 
 
-def save_state(status: str) -> None:
+def save_state(state: dict) -> None:
     with open(STATE_FILE, "w", encoding="utf-8") as f:
-        json.dump({"status": status}, f)
+        json.dump(state, f, ensure_ascii=False, indent=2)
 
 
 def main() -> None:
-    current = detect_stock(fetch_html(URL))
-    previous = load_previous_state()
+    state = load_previous_state()
 
-    print(f"previous={previous} current={current}")
+    for product in PRODUCTS:
+        name = product["name"]
+        url = product["url"]
 
-    if current == "in_stock" and previous != "in_stock":
-        send_telegram(f"Voorraad-alert: mogelijk op voorraad\n{URL}")
+        try:
+            html = fetch_html(url)
+            current, matched_hint = detect_stock(html)
+            previous = state.get(url)
 
-    save_state(current)
+            print(
+                f"{name}: previous={previous} current={current} matched_hint={matched_hint}"
+            )
+
+            if current == "in_stock" and previous != "in_stock":
+                send_telegram(
+                    f"Voorraad-alert: mogelijk op voorraad\n"
+                    f"Product: {name}\n"
+                    f"Match: {matched_hint}\n"
+                    f"{url}"
+                )
+
+            state[url] = current
+
+        except Exception as e:
+            print(f"Fout bij {name}: {e}")
+            state[url] = "error"
+
+    save_state(state)
 
 
 if __name__ == "__main__":
