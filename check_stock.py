@@ -14,6 +14,14 @@ PRODUCTS = [
         "name": "Dreamland - Ascended Heroes - Elite Trainer Box UK",
         "url": "https://www.dreamland.nl/producten/pokemon-me-2-5-ascended-heroes-elite-trainer-box-uk/02344089",
     },
+    {
+        "name": "Dreamland - Ultra Premium Collection Box - Mega Charizard X ex",
+        "url": "https://www.dreamland.nl/producten/pokemon-ultra-premium-collection-box-mega-charizard-x-ex/02321486",
+    },
+    {
+        "name": "Dreamland - Ultra Premium Collection Box - Mega Charizard X ex",
+        "url": "https://www.dreamland.nl/producten/pokemon-ultra-premium-collection-box-mega-charizard-x-ex/02321486",
+    },
 ]
 
 IN_STOCK_HINTS = [
