@@ -70,8 +70,7 @@ def scrape_items() -> dict:
                 if not href or not text:
                     continue
 
-                if "/product/" not in href:
-                    continue
+                print(f"DEBUG LINK: {href} | TEXT: {text}")
 
                 if href.startswith("/"):
                     href = f"https://www.pokemoncenter.com{href}"
