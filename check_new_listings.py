@@ -72,9 +72,13 @@ def fetch_next_data_with_playwright() -> dict:
 
         print("Opening Pokemon Center category page with Playwright...")
         page.goto(CATEGORY_URL, wait_until="domcontentloaded", timeout=60000)
+        page.wait_for_timeout(3000)
 
         print("Waiting for __NEXT_DATA__...")
         page.wait_for_selector("#__NEXT_DATA__", state="attached", timeout=15000)
+
+        count = page.locator("#__NEXT_DATA__").count()
+        print(f"__NEXT_DATA__ count: {count}")
 
         next_data_text = page.locator("#__NEXT_DATA__").inner_text()
         print(f"Read __NEXT_DATA__ with {len(next_data_text)} characters")
