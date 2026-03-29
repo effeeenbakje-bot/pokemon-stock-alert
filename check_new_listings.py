@@ -23,8 +23,10 @@ def send_telegram(text: str) -> None:
 def load_previous_items() -> dict:
     if not os.path.exists(STATE_FILE):
         return {}
+
     with open(STATE_FILE, "r", encoding="utf-8") as f:
         data = json.load(f)
+
     return data if isinstance(data, dict) else {}
 
 
@@ -38,11 +40,26 @@ def scrape_items() -> dict:
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
-        page.goto(CATEGORY_URL, wait_until="networkidle", timeout=60000)
+
+        context = browser.new_context(
+            user_agent=(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/123.0 Safari/537.36"
+            ),
+            viewport={"width": 1280, "height": 2000},
+        )
+
+        page = context.new_page()
+
+        print("Opening Pokemon Center category page...")
+        page.goto(CATEGORY_URL, wait_until="domcontentloaded", timeout=60000)
+        print("Page opened, waiting 5 seconds for extra content...")
+        page.wait_for_timeout(5000)
 
         links = page.locator("a")
         count = links.count()
+        print(f"Found {count} links on the page")
 
         for i in range(count):
             try:
@@ -59,10 +76,17 @@ def scrape_items() -> dict:
                 if href.startswith("/"):
                     href = f"https://www.pokemoncenter.com{href}"
 
+                if "elite trainer box" not in text.lower():
+                    continue
+
                 items[href] = text
+
             except Exception:
                 continue
 
+        print(f"Collected {len(items)} matching product links")
+
+        context.close()
         browser.close()
 
     return items
@@ -79,6 +103,8 @@ def main() -> None:
         for url, name in current_items.items()
         if url not in previous_items
     }
+
+    print(f"new_items_count={len(new_items)}")
 
     if previous_items and new_items:
         for url, name in new_items.items():
