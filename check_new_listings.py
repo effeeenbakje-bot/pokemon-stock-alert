@@ -70,13 +70,11 @@ def scrape_items() -> dict:
                 if not href or not text:
                     continue
 
-                print(f"DEBUG LINK: {href} | TEXT: {text}")
+                if "elite trainer box" not in text.lower():
+                    continue
 
                 if href.startswith("/"):
                     href = f"https://www.pokemoncenter.com{href}"
-
-                if "elite trainer box" not in text.lower():
-                    continue
 
                 items[href] = text
 
