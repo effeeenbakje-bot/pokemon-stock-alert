@@ -1,7 +1,7 @@
 import os
 import json
 import requests
-from playwright.sync_api import sync_playwright
+from bs4 import BeautifulSoup
 
 STATE_FILE = ".pokemoncenter_listings.json"
 CATEGORY_URL = "https://www.pokemoncenter.com/category/elite-trainer-box?sort=launch_date%2Bdesc"
@@ -35,62 +35,60 @@ def save_items(items: dict) -> None:
         json.dump(items, f, ensure_ascii=False, indent=2)
 
 
+def fetch_html(url: str) -> str:
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/123.0 Safari/537.36"
+        ),
+        "Accept-Language": "en-US,en;q=0.9",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Referer": "https://www.pokemoncenter.com/",
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache",
+    }
+
+    r = requests.get(url, headers=headers, timeout=30)
+    r.raise_for_status()
+    return r.text
+
+
 def scrape_items() -> dict:
     items = {}
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+    print("Fetching Pokemon Center category page via requests...")
+    html = fetch_html(CATEGORY_URL)
+    print(f"Downloaded {len(html)} characters of HTML")
 
-        context = browser.new_context(
-            user_agent=(
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/123.0 Safari/537.36"
-            ),
-            viewport={"width": 1280, "height": 2000},
-        )
+    soup = BeautifulSoup(html, "html.parser")
+    links = soup.find_all("a")
+    print(f"Found {len(links)} links in HTML")
 
-        page = context.new_page()
+    for link in links:
+        href = link.get("href")
+        text = link.get_text(" ", strip=True)
 
-        print("Opening Pokemon Center category page...")
-        page.goto(CATEGORY_URL, wait_until="domcontentloaded", timeout=60000)
+        if not href or not text:
+            continue
 
-        print("Waiting for page content...")
-        page.wait_for_selector("body", timeout=10000)
+        text_l = text.lower()
 
-        # Scroll om lazy loading te triggeren
-        print("Scrolling page...")
-        page.mouse.wheel(0, 3000)
-        page.wait_for_timeout(3000)
+        if "elite trainer box" not in text_l:
+            continue
 
-        links = page.locator("a")
-        count = links.count()
-        print(f"Found {count} links on the page")
+        if "/product/" not in href:
+            continue
 
-        for i in range(count):
-            try:
-                link = links.nth(i)
-                href = link.get_attribute("href")
-                text = (link.inner_text() or "").strip()
+        if href.startswith("/"):
+            href = f"https://www.pokemoncenter.com{href}"
 
-                if not href or not text:
-                    continue
+        items[href] = text
 
-                if "elite trainer box" not in text.lower():
-                    continue
+    print(f"Collected {len(items)} matching product links")
 
-                if href.startswith("/"):
-                    href = f"https://www.pokemoncenter.com{href}"
-
-                items[href] = text
-
-            except Exception:
-                continue
-
-        print(f"Collected {len(items)} matching product links")
-
-        context.close()
-        browser.close()
+    for url, name in items.items():
+        print(f"MATCH: {name} | {url}")
 
     return items
 
