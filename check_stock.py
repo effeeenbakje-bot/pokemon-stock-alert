@@ -20,7 +20,7 @@ PRODUCTS = [
     },
     {
         "name": "Dreamland - Ultra Premium Collection Box - Mega Charizard X ex",
-        "url": "https://www.vikado.nl/product/18747674/voggy-castagnetten",
+        "url": "https://www.vikado.nl/product/17196463/sleutelkast-met-specht-wildlife-garden",
     },
 ]
 
