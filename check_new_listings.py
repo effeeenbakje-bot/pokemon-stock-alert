@@ -54,41 +54,90 @@ def fetch_html(url: str) -> str:
     return r.text
 
 
-def scrape_items() -> dict:
-    items = {}
+def extract_products_from_next_data(html: str) -> list[dict]:
+    soup = BeautifulSoup(html, "html.parser")
+    script = soup.find("script", id="__NEXT_DATA__")
 
+    if not script or not script.string:
+        print("Geen __NEXT_DATA__ script gevonden")
+        return []
+
+    try:
+        data = json.loads(script.string)
+    except Exception as e:
+        print(f"Kon __NEXT_DATA__ niet parsen: {e}")
+        return []
+
+    products = (
+        data.get("props", {})
+        .get("initialState", {})
+        .get("search", {})
+        .get("results", {})
+        .get("products", [])
+    )
+
+    if not isinstance(products, list):
+        print("Products pad gevonden, maar het is geen lijst")
+        return []
+
+    return products
+
+
+def build_product_url(product: dict) -> str:
+    code = product.get("code", "").strip()
+    seo_name = product.get("seoName", "").strip()
+    url = product.get("url", "").strip()
+
+    if url:
+        if url.startswith("/"):
+            return f"https://www.pokemoncenter.com{url}"
+        return url
+
+    if code and seo_name:
+        return f"https://www.pokemoncenter.com/product/{code}/{seo_name}"
+
+    if code:
+        return f"https://www.pokemoncenter.com/product/{code}"
+
+    return ""
+
+
+def scrape_items() -> dict:
     print("Fetching Pokemon Center category page via requests...")
     html = fetch_html(CATEGORY_URL)
     print(f"Downloaded {len(html)} characters of HTML")
 
-    soup = BeautifulSoup(html, "html.parser")
-    links = soup.find_all("a")
-    print(f"Found {len(links)} links in HTML")
+    products = extract_products_from_next_data(html)
+    print(f"Found {len(products)} products in __NEXT_DATA__")
 
-    for link in links:
-        href = link.get("href")
-        text = link.get_text(" ", strip=True)
+    items = {}
 
-        if not href or not text:
+    for product in products:
+        name = (product.get("name") or "").strip()
+        code = (product.get("code") or "").strip()
+        out_of_stock = product.get("outOfStock")
+        url = build_product_url(product)
+
+        if not name or not code:
             continue
 
-        text_l = text.lower()
-
-        if "elite trainer box" not in text_l:
+        if "elite trainer box" not in name.lower():
             continue
 
-        if "/product/" not in href:
-            continue
+        items[code] = {
+            "name": name,
+            "url": url,
+            "code": code,
+            "out_of_stock": out_of_stock,
+        }
 
-        if href.startswith("/"):
-            href = f"https://www.pokemoncenter.com{href}"
+    print(f"Collected {len(items)} matching ETB products")
 
-        items[href] = text
-
-    print(f"Collected {len(items)} matching product links")
-
-    for url, name in items.items():
-        print(f"MATCH: {name} | {url}")
+    for code, item in items.items():
+        print(
+            f"MATCH: code={code} | name={item['name']} | "
+            f"out_of_stock={item['out_of_stock']} | url={item['url']}"
+        )
 
     return items
 
@@ -100,19 +149,21 @@ def main() -> None:
     print(f"previous_count={len(previous_items)} current_count={len(current_items)}")
 
     new_items = {
-        url: name
-        for url, name in current_items.items()
-        if url not in previous_items
+        code: item
+        for code, item in current_items.items()
+        if code not in previous_items
     }
 
     print(f"new_items_count={len(new_items)}")
 
     if previous_items and new_items:
-        for url, name in new_items.items():
+        for code, item in new_items.items():
             send_telegram(
                 f"Nieuwe listing gevonden op Pokemon Center\n"
-                f"Naam: {name}\n"
-                f"{url}"
+                f"Naam: {item['name']}\n"
+                f"Code: {code}\n"
+                f"Uitverkocht: {item['out_of_stock']}\n"
+                f"{item['url']}"
             )
 
     save_items(current_items)
