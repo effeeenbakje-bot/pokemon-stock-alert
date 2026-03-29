@@ -20,7 +20,7 @@ PRODUCTS = [
     },
     {
         "name": "Dreamland - Ultra Premium Collection Box - Mega Charizard X ex",
-        "url": "https://www.dreamland.nl/producten/pokemon-ultra-premium-collection-box-mega-charizard-x-ex/02321486",
+        "url": "https://www.vikado.nl/product/21353956/pokemon-tcg-mega-charizard-spring-tin-2026",
     },
 ]
 
