@@ -55,7 +55,7 @@ def scrape_items() -> dict:
         print("Opening Pokemon Center category page...")
         page.goto(CATEGORY_URL, wait_until="domcontentloaded", timeout=60000)
         print("Page opened, waiting 5 seconds for extra content...")
-        page.wait_for_timeout(5000)
+        page.wait_for_selector("a", timeout=10000)
 
         links = page.locator("a")
         count = links.count()
