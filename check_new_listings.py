@@ -74,7 +74,7 @@ def fetch_next_data_with_playwright() -> dict:
         page.goto(CATEGORY_URL, wait_until="domcontentloaded", timeout=60000)
 
         print("Waiting for __NEXT_DATA__...")
-        page.wait_for_selector("#__NEXT_DATA__", timeout=15000)
+        page.wait_for_selector("#__NEXT_DATA__", state="attached", timeout=15000)
 
         next_data_text = page.locator("#__NEXT_DATA__").inner_text()
         print(f"Read __NEXT_DATA__ with {len(next_data_text)} characters")
