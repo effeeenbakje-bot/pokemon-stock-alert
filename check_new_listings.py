@@ -39,7 +39,7 @@ def scrape_items() -> dict:
     items = {}
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        browser = p.chromium.launch(headless=False)
 
         context = browser.new_context(
             user_agent=(
