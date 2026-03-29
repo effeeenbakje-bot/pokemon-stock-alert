@@ -20,7 +20,7 @@ PRODUCTS = [
     },
     {
         "name": "Dreamland - Ultra Premium Collection Box - Mega Charizard X ex",
-        "url": "https://www.vikado.nl/product/21353956/pokemon-tcg-mega-charizard-spring-tin-2026",
+        "url": "https://www.bol.com/nl/nl/p/kotarbau-bevestigingshoeken-hoekversterking-130x130x100mm/9300000245921623/?cid=1774788613044-3928127203286&bltgh=8ecfe8e5-0e09-4725-a4ea-ad97d01a3a24.ProductList_Middle.0.ProductTitle",
     },
 ]
 
