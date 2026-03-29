@@ -39,7 +39,7 @@ def scrape_items() -> dict:
     items = {}
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)
 
         context = browser.new_context(
             user_agent=(
@@ -54,8 +54,14 @@ def scrape_items() -> dict:
 
         print("Opening Pokemon Center category page...")
         page.goto(CATEGORY_URL, wait_until="domcontentloaded", timeout=60000)
-        print("Page opened, waiting 5 seconds for extra content...")
-        page.wait_for_selector("a", timeout=10000)
+
+        print("Waiting for page content...")
+        page.wait_for_selector("body", timeout=10000)
+
+        # Scroll om lazy loading te triggeren
+        print("Scrolling page...")
+        page.mouse.wheel(0, 3000)
+        page.wait_for_timeout(3000)
 
         links = page.locator("a")
         count = links.count()
