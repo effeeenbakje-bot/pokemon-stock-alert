@@ -27,8 +27,8 @@ PRODUCTS = [
         "url": "https://www.pokecardshop.be/product-page/elite-trainer-box-ascended-heroes-pok%C3%A9mon",
     },
     {
-        "name": "pokecardshop.be - Booster Bundle - Ascended Heroes",
-        "url": "https://www.pokecardshop.be/product-page/booster-bundle-ascended-heroes-pok%C3%A9mon",
+        "name": "totalcards.net - Ascended Heroes - Booster Bundle",
+        "url": "https://totalcards.net/collections/pokemon-mega-evolution-ascended-heroes/products/pokemon-mega-evolution-ascended-heroes-booster-bundle",
     },
 ]
 
