@@ -19,8 +19,16 @@ PRODUCTS = [
         "url": "https://www.dreamland.nl/producten/pokemon-ultra-premium-collection-box-mega-charizard-x-ex/02321486",
     },
     {
+        "name": "pokecardshop.be - Ascended Heroes - Booster Bundle ",
+        "url": "https://www.pokecardshop.be/product-page/booster-bundle-ascended-heroes-pok%C3%A9mon",
+    },
+    {
+        "name": "pokecardshop.be - Ascended Heroes - Elite Trainer Box",
+        "url": "https://www.pokecardshop.be/product-page/elite-trainer-box-ascended-heroes-pok%C3%A9mon",
+    },
+    {
         "name": "pokecardshop.be - Booster Bundle - Ascended Heroes",
-        "url": "https://www.vikado.nl/product/17196463/sleutelkast-met-specht-wildlife-garden",
+        "url": "https://www.pokecardshop.be/product-page/booster-bundle-ascended-heroes-pok%C3%A9mon",
     },
 ]
 
