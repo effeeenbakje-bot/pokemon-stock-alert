@@ -71,14 +71,24 @@ def fetch_next_data_with_playwright() -> dict:
         page = context.new_page()
 
         print("Opening Pokemon Center category page with Playwright...")
-        page.goto(CATEGORY_URL, wait_until="domcontentloaded", timeout=60000)
-        page.wait_for_timeout(3000)
+        response = page.goto(CATEGORY_URL, wait_until="domcontentloaded", timeout=60000)
+        print(f"Final URL: {page.url}")
+        print(f"HTTP status: {response.status if response else 'no response'}")
 
-        print("Waiting for __NEXT_DATA__...")
-        page.wait_for_selector("#__NEXT_DATA__", state="attached", timeout=15000)
+        page.wait_for_timeout(5000)
 
-        count = page.locator("#__NEXT_DATA__").count()
-        print(f"__NEXT_DATA__ count: {count}")
+        html = page.content()
+        print(f"HTML length: {len(html)}")
+        print(f"__NEXT_DATA__ in HTML: {'__NEXT_DATA__' in html}")
+        print(f"captcha in HTML: {'captcha' in html.lower()}")
+        print(f"access denied in HTML: {'access denied' in html.lower()}")
+        print(f"verify you are human in HTML: {'verify you are human' in html.lower()}")
+
+        with open("pokemoncenter_debug.html", "w", encoding="utf-8") as f:
+            f.write(html)
+
+        if "__NEXT_DATA__" not in html:
+            raise RuntimeError("No __NEXT_DATA__ found in Playwright HTML")
 
         next_data_text = page.locator("#__NEXT_DATA__").inner_text()
         print(f"Read __NEXT_DATA__ with {len(next_data_text)} characters")
