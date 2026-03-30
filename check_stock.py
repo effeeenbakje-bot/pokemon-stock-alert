@@ -36,7 +36,8 @@ IN_STOCK_HINTS = [
     "op voorraad",
     "in winkelwagen",
     "direct leverbaar",
-    "Add to Cart",
+    "add to cart",
+    "buy now",
 ]
 
 OUT_OF_STOCK_HINTS = [
@@ -44,7 +45,9 @@ OUT_OF_STOCK_HINTS = [
     "niet leverbaar",
     "uitverkocht",
     "online tijdelijk uitverkocht",
-    "Out of Stock",
+    "out of stock",
+    "notify me when available",
+    "notify when available",
 ]
 
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
