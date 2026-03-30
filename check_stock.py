@@ -19,7 +19,7 @@ PRODUCTS = [
         "url": "https://www.dreamland.nl/producten/pokemon-ultra-premium-collection-box-mega-charizard-x-ex/02321486",
     },
     {
-        "name": "Dreamland - Ultra Premium Collection Box - Mega Charizard X ex",
+        "name": "pokecardshop.be - Booster Bundle - Ascended Heroes",
         "url": "https://www.vikado.nl/product/17196463/sleutelkast-met-specht-wildlife-garden",
     },
 ]
@@ -28,6 +28,7 @@ IN_STOCK_HINTS = [
     "op voorraad",
     "in winkelwagen",
     "direct leverbaar",
+    "Add to Cart",
 ]
 
 OUT_OF_STOCK_HINTS = [
@@ -35,6 +36,7 @@ OUT_OF_STOCK_HINTS = [
     "niet leverbaar",
     "uitverkocht",
     "online tijdelijk uitverkocht",
+    "Out of Stock",
 ]
 
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
